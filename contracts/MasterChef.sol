@@ -4,12 +4,12 @@
 
 pragma solidity 0.6.12;
 
+import "./interfaces/IMoonlift.sol";
+
 import "./libs/SafeMath.sol";
 import "./libs/IBEP20.sol";
 import "./libs/SafeBEP20.sol";
 import "./libs/Ownable.sol";
-
-import "./Moonlift.sol";
 
 // MasterChef is the master of Egg. He can make Egg and he is a fair guy.
 //
@@ -49,7 +49,7 @@ contract MasterChef is Ownable {
     }
 
     
-    Moonlift public egg;
+    IMoonlift public egg;
     // Dev address.
     address public devaddr;
     // EGG tokens created per block.
@@ -73,13 +73,13 @@ contract MasterChef is Ownable {
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
 
     constructor(
-        Moonlift _egg,
+        address _egg,
         address _devaddr,
         address _feeAddress,
         uint256 _eggPerBlock,
         uint256 _startBlock
     ) public {
-        egg = _egg;
+        egg = IMoonlift(_egg);
         devaddr = _devaddr;
         feeAddress = _feeAddress;
         eggPerBlock = _eggPerBlock;
@@ -92,7 +92,10 @@ contract MasterChef is Ownable {
 
     // Add a new lp to the pool. Can only be called by the owner.
     // XXX DO NOT add the same LP token more than once. Rewards will be messed up if you do.
-    function add(uint256 _allocPoint, IBEP20 _lpToken, uint16 _depositFeeBP, bool _withUpdate) public onlyOwner {
+    function add(uint256 _allocPoint, IBEP20 _lpToken, uint16 _depositFeeBP, bool _withUpdate)
+    public
+    onlyOwner
+    {
         require(_depositFeeBP <= 10000, "add: invalid deposit fee basis points");
         if (_withUpdate) {
             massUpdatePools();
@@ -109,7 +112,10 @@ contract MasterChef is Ownable {
     }
 
     // Update the given pool's EGG allocation point and deposit fee. Can only be called by the owner.
-    function set(uint256 _pid, uint256 _allocPoint, uint16 _depositFeeBP, bool _withUpdate) public onlyOwner {
+    function set(uint256 _pid, uint256 _allocPoint, uint16 _depositFeeBP, bool _withUpdate)
+    external
+    onlyOwner
+    {
         require(_depositFeeBP <= 10000, "set: invalid deposit fee basis points");
         if (_withUpdate) {
             massUpdatePools();
@@ -166,7 +172,7 @@ contract MasterChef is Ownable {
     }
 
     // Deposit LP tokens to MasterChef for EGG allocation.
-    function deposit(uint256 _pid, uint256 _amount) public {
+    function deposit(uint256 _pid, uint256 _amount) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
@@ -191,7 +197,7 @@ contract MasterChef is Ownable {
     }
 
     // Withdraw LP tokens from MasterChef.
-    function withdraw(uint256 _pid, uint256 _amount) public {
+    function withdraw(uint256 _pid, uint256 _amount) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         require(user.amount >= _amount, "withdraw: not good");
@@ -209,7 +215,7 @@ contract MasterChef is Ownable {
     }
 
     // Withdraw without caring about rewards. EMERGENCY ONLY.
-    function emergencyWithdraw(uint256 _pid) public {
+    function emergencyWithdraw(uint256 _pid) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         uint256 amount = user.amount;
@@ -230,18 +236,19 @@ contract MasterChef is Ownable {
     }
 
     // Update dev address by the previous dev.
-    function dev(address _devaddr) public {
+    function dev(address _devaddr) external {
         require(msg.sender == devaddr, "dev: wut?");
         devaddr = _devaddr;
     }
 
-    function setFeeAddress(address _feeAddress) public{
+    function setFeeAddress(address _feeAddress) external{
         require(msg.sender == feeAddress, "setFeeAddress: FORBIDDEN");
         feeAddress = _feeAddress;
     }
 
-    //Pancake has to add hidden dummy pools inorder to alter the emission, here we make it simple and transparent to all.
-    function updateEmissionRate(uint256 _eggPerBlock) public onlyOwner {
+    // Pancake has to add hidden dummy pools inorder to alter the emission, here we make it
+    // simple and transparent to all.
+    function updateEmissionRate(uint256 _eggPerBlock) external onlyOwner {
         massUpdatePools();
         eggPerBlock = _eggPerBlock;
     }
