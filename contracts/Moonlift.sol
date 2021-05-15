@@ -12,50 +12,31 @@ import "./interfaces/IUniswapV2Router02.sol";
 contract Moonlift is BEP20WithFee("Moonlift", "MLT"), Governance {
     using Address for address;
 
-    address public _chef;
-
-    event ChefChanged(address newChef);
-
-    modifier onlyChef() {
-        require(_msgSender() == _chef, "not a chef");
-        _;
-    }
-
-    constructor(address router) public {
+    constructor(address router, address BUSD) public {
         if (router != address(0)) {
-            IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(router);
-
-            // Create a uniswap pair for this new token
-            address uniswapV2Pair = IUniswapV2Factory(
-                _uniswapV2Router.factory()
-            ).createPair(address(this), _uniswapV2Router.WETH());
-
-            // Adding new pair to track
-            _addPairToTrack(uniswapV2Pair);
+            _createPair(router, IUniswapV2Router02(router).WETH());
+            if (BUSD != address(0)) {
+                _createPair(router, BUSD);
+            }
         }
 
-        // no taxes from owner
+        // minting 100b to the owner
         setTaxless(_msgSender(), true);
-
-        // minting 100kkk to the owner
         _mint(_msgSender(), 100_000_000_000e18);
+    }
+
+    function _createPair(address router, address token1) private {
+        address pair = IUniswapV2Factory(IUniswapV2Router02(router).factory()).createPair(address(this), token1);
+        _addPairToTrack(pair);
+        rewardsExcluded[pair] = true;
+        rewardsExcluded[getPairVault(pair)] = true;
     }
 
     // --==[ Public functions ]==--
     function addPairToTrack(address pair) external onlyOwner {
         _addPairToTrack(pair);
-    }
-
-    function setChef(address chef_) external onlyOwner {
-        require(chef_ != address(0), "Chef is zero-address");
-        _chef = chef_;
-        emit ChefChanged(chef_);
-    }
-
-    /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
-    function mint(address _to, uint256 _amount) external onlyChef {
-        _mint(_to, _amount);
-        _moveDelegates(address(0), _delegates[_to], _amount);
+        rewardsExcluded[pair] = true;
+        rewardsExcluded[getPairVault(pair)] = true;
     }
 
     function burn(uint256 amount) external {
@@ -71,7 +52,7 @@ contract Moonlift is BEP20WithFee("Moonlift", "MLT"), Governance {
         _burn(account, amount);
     }
 
-    function _balanceOf(address account) internal override view returns(uint256) {
+    function _balanceOf(address account) internal override view returns (uint256) {
         return balanceOf(account);
     }
 
@@ -79,4 +60,3 @@ contract Moonlift is BEP20WithFee("Moonlift", "MLT"), Governance {
         return name();
     }
 }
-

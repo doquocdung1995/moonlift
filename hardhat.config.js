@@ -14,6 +14,10 @@ task("new_wallet", "Generates account address", async () => {
   console.log(`\tAddress: ${wallet.address}`)
   console.log(`\tMnemonic: ${wallet._mnemonic().phrase}`)
 })
+task("private", "Generates account address", async () => {
+  const wallet = await ethers.Wallet.fromMnemonic(mnemonic)
+  console.log(wallet.privateKey);
+})
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
