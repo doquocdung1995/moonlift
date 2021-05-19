@@ -9,7 +9,7 @@ import "./abstracts/BEP20WithFee.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Router02.sol";
 
-contract Moonlift is BEP20WithFee("Moonlift", "MLT"), Governance {
+contract Moonlift is BEP20WithFee("Moonlift", "MLTP"), Governance {
     using Address for address;
 
     constructor(address router, address BUSD) public {
