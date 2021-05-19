@@ -20,7 +20,7 @@ abstract contract BEP20WithFee is BEP20WithHoldersDistribution, PairsHolder {
     uint256 public burnPart = 1500; // 15%
     uint256 public projectPart = 1000; // 10%
 
-    uint256 private minLPBalance = 1e18;
+    uint256 private constant minLPBalance = 1e18;
 
     // --==[ WALLETS ]==--
     address public teamWallet;
@@ -35,9 +35,6 @@ abstract contract BEP20WithFee is BEP20WithHoldersDistribution, PairsHolder {
     uint256 public totalLpFee;
     uint256 public totalProtocolFee;
     uint256 public totalHoldersFee;
-
-    address internal wBNB;
-    address internal router;
 
     // --==[ Events ]==--
     event LpRewarded(address indexed lpPair, uint256 amount);
