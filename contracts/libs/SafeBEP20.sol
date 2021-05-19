@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
-
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity 0.6.12;
 
 import "./IBEP20.sol";
-import './SafeMath.sol';
-import './Address.sol';
+import "./SafeMath.sol";
+import "./Address.sol";
 
 /**
  * @title SafeBEP20
@@ -51,7 +50,8 @@ library SafeBEP20 {
     }
 
     function safeDecreaseAllowance(IBEP20 token, address spender, uint256 value) internal {
-        uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeBEP20: decreased allowance below zero");
+        uint256 newAllowance = token.allowance(address(this), spender).sub(value,
+            "SafeBEP20: decreased allowance below zero");
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 

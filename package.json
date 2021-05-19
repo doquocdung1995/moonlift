@@ -1,0 +1,37 @@
+{
+  "name": "@moonlift/moonlift",
+  "license": "MIT",
+  "files": [
+    "contracts"
+  ],
+  "scripts": {
+    "clean": "hardhat clean",
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy-testnet": "hardhat run --network testnet scripts/deploy.js\n",
+    "account": "hardhat account\n",
+    "new_wallet": "hardhat new_wallet\n",
+    "hardhat": "hardhat",
+    "lint": "yarn run lint:sol",
+    "lint:sol": "solhint --config .solhint.json --max-warnings 0 \"contracts/**/*.sol\"",
+    "test": "hardhat test",
+    "etherscan:verify": "npx buidler verify",
+    "etherscan:verify-test": "npx buidler verify --network testnet"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-etherscan": "^2.1.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@uniswap/lib": "^1.1.1",
+    "@uniswap/v2-core": "^1.0.1",
+    "@uniswap/v2-periphery": "*",
+    "chai": "^4.3.4",
+    "eslint": "^7.11.0",
+    "ethereum-waffle": "^3.3.0",
+    "ethereumjs-util": "^7.0.10",
+    "ethers": "^5.1.4",
+    "hardhat": "^2.2.1",
+    "solc": "0.6.12",
+    "solhint": "^3.3.3"
+  }
+}
